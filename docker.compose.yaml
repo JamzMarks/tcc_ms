@@ -1,0 +1,22 @@
+services:
+  postgres:
+    image: postgres
+    container_name: postgres_user
+    restart: always
+    environment:
+      POSTGRES_USER: userms
+      POSTGRES_PASSWORD: secret123
+      POSTGRES_DB: usermsdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  adminer:
+    image: adminer
+    ports:
+      - "8080:8080" 
+
+
+volumes:
+  postgres_data:
