@@ -5,18 +5,15 @@ import { UserDto } from 'src/dto/user.dto';
 import { RolesGuard } from '@guards/role.guard';
 import { Role } from '@decorators/role.decorator';
 import { Roles } from 'generated/prisma';
+import { AuthGuard } from '@guards/auth.guard';
+import { OwnerOrAdminGuard } from '@guards/OwnerOrAdmin.guard';
 
-
-@UseGuards(RolesGuard)
+@UseGuards(AuthGuard, RolesGuard)
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Get()
-  getHello(): string {
-    return this.userService.getHello();
-  }
-
+  
   @Get() findUsers() {
     return this.userService.findUsers();
   }
@@ -33,10 +30,13 @@ export class UserController {
     return this.userService.createUser(createUserDto);
   }
 
+
+  @UseGuards(AuthGuard, OwnerOrAdminGuard)
   @Patch(':id') updateUser(@Param('id') id: string, @Body() userDto: Partial<UserDto>) {
     return this.userService.updateUser(id, userDto);
   }
 
+  @Role(Roles.ADMIN)
   @Delete(':id') deleteUser(@Param('id') id: string) {
     return this.userService.deleteUser({id});
   }

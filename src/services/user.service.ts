@@ -1,16 +1,29 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnModuleInit } from '@nestjs/common';
 import { PrismaService } from './prisma.service';
-import { Prisma, User } from 'generated/prisma/client';
-import * as bcrypt from 'bcrypt';
+import { Prisma, Roles, User } from 'generated/prisma/client';
 import { hashPassword } from '@utils/HashPassword';
 import { UserDto } from 'src/dto/user.dto';
 
 @Injectable()
-export class UserService {
+export class UserService implements OnModuleInit {
   constructor(private prisma: PrismaService) {}
 
-  getHello(): string {
-    return 'Hello World!';
+  async onModuleInit() {
+    const users = await this.prisma.user.count();
+    if (users === 0) {
+      const hash = await hashPassword('Admin123!');
+
+      await this.prisma.user.create({
+        data: {
+          email: 'admin@system.local',
+          password: hash,
+          role: Roles.ADMIN,
+          firstName: 'Admin',
+          lastName: 'System',
+        },
+      });
+      console.log('✅ Default admin created.');
+    }
   }
 
   async findUsers(): Promise<Omit<User, 'password' | 'isActive'>[]> {
@@ -73,8 +86,8 @@ export class UserService {
   }
 
   async updateUser(id: string, data: Partial<UserDto>): Promise<User> {
-    const {email} = data;
-    if(email){
+    const { email } = data;
+    if (email) {
       data.email = email.trim().toLowerCase();
     }
     return this.prisma.user.update({

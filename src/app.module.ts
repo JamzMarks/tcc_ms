@@ -1,16 +1,18 @@
+import { TerminusModule } from '@nestjs/terminus';
 import { Module } from '@nestjs/common';
-import { UserController } from './controllers/user.controller';
+import { JwtModule } from '@nestjs/jwt';
 import { UserService } from './services/user.service';
 import { PrismaService } from './services/prisma.service';
 import { AuthService } from './services/auth.service';
-import { JwtModule } from '@nestjs/jwt';
+import { UserController } from './controllers/user.controller';
 import { AuthController } from './controllers/auth.controller';
 
 @Module({
   imports: [
+    TerminusModule,
     JwtModule.register({
       global: true,
-      secret: 'your_jwt_secret', // Use a strong secret in production
+      secret: process.env.JWT_SECRET, // Use a strong secret in production
       signOptions: { expiresIn: '1h' },
     })
   ],
