@@ -29,6 +29,8 @@ jobs:
       - name: 📥 Instalar dependências
         run: pnpm install
 
+      - name: ⚙️ Gerar Prisma Client
+        run: pnpm prisma generate
 
       # - name: 🧪 Rodar testes
       #   run: pnpm test
