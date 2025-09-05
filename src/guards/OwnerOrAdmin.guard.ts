@@ -1,4 +1,5 @@
 import { CanActivate } from '@nestjs/common';
+import { Roles } from 'generated/prisma';
 
 export class OwnerOrAdminGuard implements CanActivate{
 
@@ -9,7 +10,7 @@ export class OwnerOrAdminGuard implements CanActivate{
 
         if (!user) return false;
 
-        if(!user.roles.includes('ADMIN') && user.sub !== idParam) {
+        if(!user.roles.includes(Roles.ADMIN) && user.sub !== idParam) {
             return false;
         }
 

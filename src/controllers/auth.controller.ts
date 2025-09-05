@@ -1,5 +1,5 @@
 import { AuthService } from './../services/auth.service';
-import { Body, Controller, Get, Post, Res } from "@nestjs/common";
+import { Body, Controller, Get, Post, Res,Version  } from "@nestjs/common";
 import { ApiResponse } from '@nestjs/swagger';
 import { LoginDto } from "src/dto/login.dto";
 import { Response } from 'express';
@@ -11,10 +11,10 @@ export class AuthController {
     constructor(private readonly authService: AuthService, private jwtService: JwtService) {}
     
     @Post('signin')
+    @Version('1')
     @ApiResponse({ status: 200, description: 'Success signin.'})
     async signIn(@Body() loginDto: LoginDto, @Res() res: Response) {
         const token = await this.authService.signin(loginDto);
-        
         res.cookie('access_token', token, {
             httpOnly: true, 
             secure: process.env.NODE_ENV === 'production',
@@ -26,6 +26,7 @@ export class AuthController {
         return res.send({ message: 'Login realizado com sucesso!' });
     }
 
+    @Version('1')
     @Get('test')
     async signTest(@Res() res: Response){
         const user = {
