@@ -13,6 +13,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: 📦 Instalar PNPM
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+          run_install: false
+          
       - name: ⬇️ Checkout do código
         uses: actions/checkout@v4
 
@@ -22,13 +28,9 @@ jobs:
           node-version: 24
           cache: 'pnpm'
 
-      - name: 📦 Instalar PNPM
-        uses: pnpm/action-setup@v2
-        with:
-          version: 8
-
       - name: 📥 Instalar dependências
         run: pnpm install
+
 
       # - name: 🧪 Rodar testes
       #   run: pnpm test
