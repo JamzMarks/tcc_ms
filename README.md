@@ -20,19 +20,53 @@
 </p>
   <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
   [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
-
+# TCC_users_ms - Microserviço de Usuários
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+Este é o microserviço de Usuários do sistema desenvolvido para o meu Trabalho de Conclusão de Curso (TCC), utilizando o framework [Nest](https://github.com/nestjs/nest)
 
-## Project setup
+## ✨ Funcionalidades
 
+- **CRUD de usuários** (Criar, Ler, Atualizar, Deletar)
+- **Autenticação de usuários** (com geração de token JWT)
+- **Emissão de eventos** para outros microserviços:
+  - `user_created`
+  - `user_updated`
+  - `user_deleted`
+  - `user_logged`
+  - `user_password_change`
+ 
+  Todos os eventos são focados em *Auditoria*.
+
+## 📦 Parte de uma Arquitetura de Microserviços
+
+Este serviço se comunica com os demais microserviços da aplicação através de mensagens assíncronas, utilizando um broker de mensageria **RabbitMQ**.
+
+## 🛠 Tecnologias Utilizadas
+
+- [NestJS](https://nestjs.com/)
+- TypeScript
+- JWT para autenticação
+- Docker (opcional para containerização)
+- Mensageria RabbitMQ
+- Documentação Swagger
+- Jest para Testes
+- ESLint para padrões de código
+
+---
+
+> Este projeto faz parte de um sistema maior desenvolvido como requisito para o TCC.
+
+## Setup do Projeto
+
+Instalar dependências do projeto:
 ```bash
 $ pnpm install
 ```
 
-## Compile and run the project
+## Compilação do projeto
 
+Três scripts para cada caso de inicialização:
 ```bash
 # development
 $ pnpm run start
@@ -46,6 +80,7 @@ $ pnpm run start:prod
 
 ## Run tests
 
+Scripts de testes (em desenvolvimento):
 ```bash
 # unit tests
 $ pnpm run test
@@ -69,29 +104,6 @@ $ mau deploy
 ```
 
 With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
 
 ## License
 
