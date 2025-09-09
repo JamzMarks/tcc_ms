@@ -10,17 +10,7 @@ import { HttpsOptions } from '@nestjs/common/interfaces/external/https-options.i
 
 
 async function bootstrap() {
-  
-  // app.connectMicroservice<MicroserviceOptions>({
-  //   transport: Transport.RMQ,
-  //   options: {
-  //     urls: [process.env.RABBITMQ_URL!],
-  //     queue: process.env.RABBITMQ_USERMS_QUEUE!,
-  //     queueOptions: {
-  //       durable: true
-  //     },
-  //   }
-  // });
+
   const httpsOptions: HttpsOptions = {
     key: readFileSync('./localhost-key.pem'),
     cert: readFileSync('./localhost.pem'),
@@ -54,8 +44,6 @@ async function bootstrap() {
     jsonDocumentUrl: 'swagger/json',
   });
 
-
-  // app.startAllMicroservices();
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();

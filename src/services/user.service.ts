@@ -1,3 +1,4 @@
+import { ProducerService } from '@services/producer.service';
 import {
   BadRequestException,
   Injectable,
@@ -8,10 +9,13 @@ import { PrismaService } from './prisma.service';
 import { Prisma, Roles, User } from 'generated/prisma/client';
 import { hashPassword } from '@utils/HashPassword';
 import { UserDto } from 'src/dto/user.dto';
+import { UserResponseDto } from 'src/dto/user-response.dto';
 
 @Injectable()
 export class UserService implements OnModuleInit {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService, private ProducerService: ProducerService) {
+    
+  }
 
   async onModuleInit() {
     const users = await this.prisma.user.count();
@@ -31,58 +35,57 @@ export class UserService implements OnModuleInit {
     }
   }
 
-  async findUsers(): Promise<Omit<User, 'password' | 'isActive'>[]> {
-    return this.prisma.user.findMany({
-      select: {
-        id: true,
-        email: true,
-        firstName: true,
-        lastName: true,
-        createdAt: true,
-        updatedAt: true,
-        role: true,
-      },
-    });
-  }
+  async findUsers(): Promise<UserResponseDto[]> {
+  return this.prisma.user.findMany({
+    select: {
+      id: true,
+      email: true,
+      firstName: true,
+      lastName: true,
+      createdAt: true,
+      updatedAt: true,
+      role: true,
+      avatar: true
+    },
+  });
+}
 
-  async findUserById(
-    id: string,
-  ): Promise<Omit<User, 'password' | 'isActive'> | null> {
-    const user = this.prisma.user.findUnique({
-      where: { id },
-      select: {
-        id: true,
-        email: true,
-        firstName: true,
-        lastName: true,
-        createdAt: true,
-        updatedAt: true,
-        role: true,
-      },
-    });
-    if (!user) throw new NotFoundException('User not found');
-    return user;
-  }
+  async findUserById(id: string): Promise<UserResponseDto> {
+  const user = await this.prisma.user.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      email: true,
+      firstName: true,
+      lastName: true,
+      createdAt: true,
+      updatedAt: true,
+      avatar: true,
+      role: true
+    },
+  });
 
-  async findByEmail(
-    email: string,
-  ): Promise<Omit<User, 'password' | 'isActive'> | null> {
-    const user = await this.prisma.user.findUnique({
-      where: { email },
-      select: {
-        id: true,
-        email: true,
-        firstName: true,
-        lastName: true,
-        createdAt: true,
-        updatedAt: true,
-        role: true,
-      },
-    });
-    if (!user)
-      throw new NotFoundException('User not found');
-    return user;
-  }
+  if (!user) throw new NotFoundException('User not found');
+  return user;
+}
+
+  async findByEmail(email: string): Promise<UserResponseDto> {
+  const user = await this.prisma.user.findUnique({
+    where: { email },
+    select: {
+      id: true,
+      email: true,
+      firstName: true,
+      lastName: true,
+      createdAt: true,
+      updatedAt: true,
+      role: true,
+    },
+  });
+
+  if (!user) throw new NotFoundException('User not found');
+  return user;
+}
 
   async createUser(data: Prisma.UserCreateInput): Promise<User> {
     const email = data.email.trim().toLowerCase();

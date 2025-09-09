@@ -10,8 +10,9 @@ import { OwnerOrAdminGuard } from '@guards/OwnerOrAdmin.guard';
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, ApiTags, ApiBody} from '@nestjs/swagger';
 
 @ApiTags('Users')        // Nome do grupo no Swagger
-@ApiBearerAuth()         // Indica que precisa de token
-@UseGuards(AuthGuard, RolesGuard)
+// @ApiBearerAuth()         // Indica que precisa de token
+// @UseGuards(AuthGuard, RolesGuard)
+@UseGuards( RolesGuard)
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}

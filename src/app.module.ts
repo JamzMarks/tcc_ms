@@ -7,30 +7,36 @@ import { AuthService } from './services/auth.service';
 import { UserController } from './controllers/user.controller';
 import { AuthController } from './controllers/auth.controller';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { ProducerService } from '@services/producer.service';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { RabbitMQModule } from '@golevelup/nestjs-rabbitmq';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
     TerminusModule,
-    ClientsModule.register([
-      {
-        name: 'USER_SERVICE',
-        transport: Transport.RMQ,
-        options: {
-          urls: [process.env.RABBITMQ_URL!],
-          queue: process.env.RABBITMQ_USERMS_QUEUE!,
-          queueOptions: {
-            durable: true,
-          },
-        },
-      },
-    ]),
-    JwtModule.register({
-      global: true,
-      secret: process.env.JWT_SECRET, // Use a strong secret in production
-      signOptions: { expiresIn: '1h' },
+    RabbitMQModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => ({
+        exchanges: [
+          { name: 'users_queue', type: 'topic' },
+        ],
+        uri: configService.get<string>('RABBITMQ_URI'),
+        connectionInitOptions: { wait: true },
+      }),
+      inject: [ConfigService],
+    }),
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        secret: configService.get<string>('JWT_SECRET'),
+        signOptions: { expiresIn: '1h' },
+      }),
+      inject: [ConfigService],
     }),
   ],
   controllers: [UserController, AuthController],
-  providers: [UserService, PrismaService, AuthService],
+  providers: [UserService, PrismaService, AuthService, ProducerService],
+  exports: [ProducerService]
 })
 export class AppModule {}
