@@ -22,4 +22,7 @@ export class UserResponseDto {
 
   @ApiProperty({ example: '2025-08-27T20:05:00.000Z' })
   updatedAt: Date;
+
+  @ApiProperty({ example: 'path' })
+   avatar?: string | null;
 }

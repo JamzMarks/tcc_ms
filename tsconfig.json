@@ -20,7 +20,11 @@
     "paths": {
       "@utils/*": ["src/utils/*"],
       "@decorators/*": ["src/decorators/*"],
-      "@guards/*": ["src/guards/*"]
+      "@guards/*": ["src/guards/*"],
+      "@services/*": ["src/services/*"],
+      "@controllers/*": ["src/controllers/*"],
+      "@dtos/*": ["src/dtos/*"],
+      "@interceptors/*": ["src/interceptors/*"]
     }
   }
 }
