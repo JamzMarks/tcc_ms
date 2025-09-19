@@ -2,10 +2,12 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Roles } from 'generated/prisma';
 import { IsEmail, IsNotEmpty, MinLength } from 'class-validator';
+import { Transform } from 'class-transformer';
 
 export class CreateUserDto {
   @ApiProperty({ example: 'john@example.com' })
   @IsEmail()
+  @Transform(({ value }) => value?.trim())
   email: string;
 
   @ApiProperty({ example: 'John' })

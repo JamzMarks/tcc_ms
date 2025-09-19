@@ -50,7 +50,7 @@ export class UserController {
   @Role(Roles.ADMIN)
   @Post() createUser(@Body() createUserDto: CreateUserDto) {
     return this.userService.createUser(createUserDto);
-  }
+  }                                                                                                                                                                                         
 
   @ApiOperation({ summary: 'Update an existing user' })
   @ApiParam({ name: 'id', type: String })

@@ -23,7 +23,7 @@
       "@guards/*": ["src/guards/*"],
       "@services/*": ["src/services/*"],
       "@controllers/*": ["src/controllers/*"],
-      "@dtos/*": ["src/dtos/*"],
+      "@dtos/*": ["src/dto/*"],
       "@interceptors/*": ["src/interceptors/*"]
     }
   }

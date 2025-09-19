@@ -21,6 +21,17 @@ enum Roles {
   AUDITOR
 }
 
+enum Theme {
+  LIGHT
+  DARK
+}
+
+enum Language {
+  PTBR
+  EN
+  ES
+}
+
 model User {
   id        String  @id @default(uuid())
   email     String  @unique
@@ -30,7 +41,17 @@ model User {
   role      Roles   @default(USER)
   avatar    String?
 
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  isActive   Boolean     @default(true)
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  UserConfig UserConfig?
+}
+
+model UserConfig {
+  id       String   @id @default(uuid())
+  userId   String   @unique
+  language Language @default(EN)
+  theme    Theme    @default(LIGHT)
+
+  user User @relation(fields: [userId], references: [id])
 }
