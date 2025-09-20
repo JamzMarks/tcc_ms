@@ -6,10 +6,11 @@ import { PrismaService } from './services/prisma.service';
 import { AuthService } from './services/auth.service';
 import { UserController } from './controllers/user.controller';
 import { AuthController } from './controllers/auth.controller';
-import { ClientsModule, Transport } from '@nestjs/microservices';
-import { ProducerService } from '@services/producer.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { RabbitMQModule } from '@golevelup/nestjs-rabbitmq';
+import { BrokerService } from '@services/broker.service';
+import { UserConfigController } from '@controllers/user-config.controller';
+import { UserConfigService } from '@services/userConfig.service';
 
 @Module({
   imports: [
@@ -35,8 +36,8 @@ import { RabbitMQModule } from '@golevelup/nestjs-rabbitmq';
       inject: [ConfigService],
     }),
   ],
-  controllers: [UserController, AuthController],
-  providers: [UserService, PrismaService, AuthService, ProducerService],
-  exports: [ProducerService]
+  controllers: [UserController, AuthController, UserConfigController],
+  providers: [UserService, PrismaService, AuthService, BrokerService, UserConfigService],
+  exports: []
 })
 export class AppModule {}

@@ -10,10 +10,13 @@ import { Prisma, Roles, User } from 'generated/prisma/client';
 import { hashPassword } from '@utils/HashPassword';
 import { UserDto } from 'src/dto/user.dto';
 import { UserResponseDto } from 'src/dto/user-response.dto';
+import { BrokerService } from './broker.service';
+import { CreateUserDto } from 'src/dto/create-user.dto';
+import { parseRole } from '@utils/parseRole';
 
 @Injectable()
 export class UserService implements OnModuleInit {
-  constructor(private prisma: PrismaService, private ProducerService: ProducerService) {
+  constructor(private prisma: PrismaService, private loggerService: BrokerService) {
     
   }
 
@@ -44,6 +47,7 @@ export class UserService implements OnModuleInit {
       lastName: true,
       createdAt: true,
       updatedAt: true,
+      isActive: true,
       role: true,
       avatar: true
     },
@@ -87,22 +91,25 @@ export class UserService implements OnModuleInit {
   return user;
 }
 
-  async createUser(data: Prisma.UserCreateInput): Promise<User> {
-    const email = data.email.trim().toLowerCase();
+  async createUser(data: CreateUserDto): Promise<User> {
+    const email = data.email.toLowerCase();
 
     const existingUser = await this.prisma.user.findUnique({
       where: { email: data.email },
     });
     if (existingUser) throw new BadRequestException('Email already in use');
-
+    const role = data.role ? parseRole(data.role) : Roles.USER;
     const hashedPassword = await hashPassword(data.password);
-    return this.prisma.user.create({
-      data: {
-        ...data,
-        email,
-        password: hashedPassword,
-      },
+    const user = await this.prisma.user.create({
+       data: {
+         ...data,
+         email,
+         password: hashedPassword,
+         role: role
+       },
     });
+    // this.loggerService.log('Usuário criado', 'info', { action: 'create_user' });
+    return user;
   }
 
   async updateUser(id: string, data: Partial<UserDto>): Promise<User> {
@@ -129,12 +136,17 @@ export class UserService implements OnModuleInit {
   }
 
   async deleteUser(id: string): Promise<User> {
-    const user = await this.prisma.user.findUnique({ where: { id } });
-    if (!user) throw new NotFoundException('User not found');
-    return this.prisma.user.delete({
+  try {
+    return await this.prisma.user.delete({
       where: { id },
     });
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+      throw new NotFoundException('User not found');
+    }
+    throw error;
   }
+}
 
   async getUsersRoles(): Promise<string[]> {
     return Object.values(Roles);
