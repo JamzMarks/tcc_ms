@@ -6,7 +6,7 @@ import { RolesGuard } from '@guards/role.guard';
 import { Role } from '@decorators/role.decorator';
 import { Roles } from 'generated/prisma';
 import { AuthGuard } from '@guards/auth.guard';
-import { OwnerOrAdminGuard } from '@guards/OwnerOrAdmin.guard';
+import { OwnerGuard } from '@guards/Owner.guard';
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, ApiTags, ApiBody} from '@nestjs/swagger';
 
 @ApiTags('Users')        // Nome do grupo no Swagger
@@ -58,7 +58,7 @@ export class UserController {
   @ApiResponse({ status: 200, description: 'User updated successfully.' })
   @ApiResponse({ status: 404, description: 'User not found.' })
   @Version('1')
-  @UseGuards(AuthGuard, OwnerOrAdminGuard)
+  @UseGuards(AuthGuard, OwnerGuard)
   @Patch(':id') updateUser(@Param('id') id: string, @Body() userDto: Partial<UserDto>) {
     return this.userService.updateUser(id, userDto);
   }
