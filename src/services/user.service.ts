@@ -13,12 +13,16 @@ import { UserResponseDto } from 'src/dto/user-response.dto';
 import { BrokerService } from './broker.service';
 import { CreateUserDto } from 'src/dto/create-user.dto';
 import { parseRole } from '@utils/parseRole';
+import { UserConfigService } from './userConfig.service';
+import { CreateUserConfigDto } from '@dtos/userConfig/create-user-config.dto';
 
 @Injectable()
 export class UserService implements OnModuleInit {
-  constructor(private prisma: PrismaService, private loggerService: BrokerService) {
-    
-  }
+  constructor(
+    private prisma: PrismaService,
+    private loggerService: BrokerService,
+    private userConfigService: UserConfigService,
+  ) {}
 
   async onModuleInit() {
     const users = await this.prisma.user.count();
@@ -35,61 +39,62 @@ export class UserService implements OnModuleInit {
         },
       });
       console.log('✅ Default admin created.');
+      
     }
   }
 
   async findUsers(): Promise<UserResponseDto[]> {
-  return this.prisma.user.findMany({
-    select: {
-      id: true,
-      email: true,
-      firstName: true,
-      lastName: true,
-      createdAt: true,
-      updatedAt: true,
-      isActive: true,
-      role: true,
-      avatar: true
-    },
-  });
-}
+    return this.prisma.user.findMany({
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        createdAt: true,
+        updatedAt: true,
+        isActive: true,
+        role: true,
+        avatar: true,
+      },
+    });
+  }
 
   async findUserById(id: string): Promise<UserResponseDto> {
-  const user = await this.prisma.user.findUnique({
-    where: { id },
-    select: {
-      id: true,
-      email: true,
-      firstName: true,
-      lastName: true,
-      createdAt: true,
-      updatedAt: true,
-      avatar: true,
-      role: true
-    },
-  });
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        createdAt: true,
+        updatedAt: true,
+        avatar: true,
+        role: true,
+      },
+    });
 
-  if (!user) throw new NotFoundException('User not found');
-  return user;
-}
+    if (!user) throw new NotFoundException('User not found');
+    return user;
+  }
 
   async findByEmail(email: string): Promise<UserResponseDto> {
-  const user = await this.prisma.user.findUnique({
-    where: { email },
-    select: {
-      id: true,
-      email: true,
-      firstName: true,
-      lastName: true,
-      createdAt: true,
-      updatedAt: true,
-      role: true,
-    },
-  });
+    const user = await this.prisma.user.findUnique({
+      where: { email },
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        createdAt: true,
+        updatedAt: true,
+        role: true,
+      },
+    });
 
-  if (!user) throw new NotFoundException('User not found');
-  return user;
-}
+    if (!user) throw new NotFoundException('User not found');
+    return user;
+  }
 
   async createUser(data: CreateUserDto): Promise<User> {
     const email = data.email.toLowerCase();
@@ -100,16 +105,23 @@ export class UserService implements OnModuleInit {
     if (existingUser) throw new BadRequestException('Email already in use');
     const role = data.role ? parseRole(data.role) : Roles.USER;
     const hashedPassword = await hashPassword(data.password);
-    const user = await this.prisma.user.create({
-       data: {
-         ...data,
-         email,
-         password: hashedPassword,
-         role: role
-       },
-    });
+    try {
+      const user = await this.prisma.user.create({
+        data: {
+          ...data,
+          email,
+          password: hashedPassword,
+          role: role,
+        },
+      });
+      const userConfig = this.userConfigService.createUserConfig({
+        userId: user.id,
+      } as CreateUserConfigDto);
+      return user;
+    } catch (error) {
+      throw new Error(error);
+    }
     // this.loggerService.log('Usuário criado', 'info', { action: 'create_user' });
-    return user;
   }
 
   async updateUser(id: string, data: Partial<UserDto>): Promise<User> {
@@ -136,17 +148,20 @@ export class UserService implements OnModuleInit {
   }
 
   async deleteUser(id: string): Promise<User> {
-  try {
-    return await this.prisma.user.delete({
-      where: { id },
-    });
-  } catch (error) {
-    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
-      throw new NotFoundException('User not found');
+    try {
+      return await this.prisma.user.delete({
+        where: { id },
+      });
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2025'
+      ) {
+        throw new NotFoundException('User not found');
+      }
+      throw error;
     }
-    throw error;
   }
-}
 
   async getUsersRoles(): Promise<string[]> {
     return Object.values(Roles);
