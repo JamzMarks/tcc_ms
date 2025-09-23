@@ -9,9 +9,9 @@ export class CreateUserConfigDto {
 
   @ApiProperty({ enum: Language, default: Language.EN })
   @IsEnum(Language)
-  language: Language;
+  language?: Language;
 
   @ApiProperty({ enum: Theme, default: Theme.LIGHT })
   @IsEnum(Theme)
-  theme: Theme;
+  theme?: Theme;
 }

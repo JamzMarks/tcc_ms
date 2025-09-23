@@ -33,8 +33,8 @@ export class UserConfigService {
       const newConfig = await this.prisma.userConfig.create({
         data: {
           userId: data.userId,
-          language: data.language,
-          theme: data.theme,
+          ...(data.language && { language: data.language }),
+          ...(data.theme && { theme: data.theme }),
         },
       });
       return newConfig;
