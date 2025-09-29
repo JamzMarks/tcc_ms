@@ -11,6 +11,8 @@ import { RabbitMQModule } from '@golevelup/nestjs-rabbitmq';
 import { BrokerService } from '@services/broker.service';
 import { UserConfigController } from '@controllers/user-config.controller';
 import { UserConfigService } from '@services/userConfig.service';
+import { SchemaService } from '@services/schema.service';
+import { SchemaController } from '@controllers/schema.controller';
 
 @Module({
   imports: [
@@ -36,8 +38,8 @@ import { UserConfigService } from '@services/userConfig.service';
       inject: [ConfigService],
     }),
   ],
-  controllers: [UserController, AuthController, UserConfigController],
-  providers: [UserService, PrismaService, AuthService, BrokerService, UserConfigService],
+  controllers: [UserController, AuthController, UserConfigController, SchemaController],
+  providers: [UserService, PrismaService, AuthService, BrokerService, UserConfigService, SchemaService],
   exports: []
 })
 export class AppModule {}

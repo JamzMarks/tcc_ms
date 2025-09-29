@@ -41,7 +41,7 @@ model User {
   role      Roles   @default(USER)
   avatar    String?
 
-  isActive   Boolean     @default(true)
+  isActive   Boolean     @default(false)
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
   UserConfig UserConfig?
@@ -53,5 +53,5 @@ model UserConfig {
   language Language @default(EN)
   theme    Theme    @default(LIGHT)
 
-  user User @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

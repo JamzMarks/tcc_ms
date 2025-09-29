@@ -1,17 +1,22 @@
 import { CanActivate, ExecutionContext } from '@nestjs/common';
-export class OwnerGuard implements CanActivate{
 
-    async canActivate(context: ExecutionContext): Promise<boolean> {
-        const request = context.switchToHttp().getRequest();
-        const user = request.user; 
-        const idParam = request.params.id;
+export class OwnerGuard implements CanActivate {
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const request = context.switchToHttp().getRequest();
+    const user = request.user;
 
-        if (!user) return false;
+    if (!user) return false;
 
-        if(user.sub !== idParam) {
-            return false;
-        }
+    const { id, email } = request.params;
 
-        return true;
-     }
+    if (id) {
+      return user.sub === id; 
+    }
+
+    if (email) {
+      return user.email === email; 
+    }
+
+    return false;
+  }
 }

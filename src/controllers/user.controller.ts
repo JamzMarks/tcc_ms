@@ -9,10 +9,9 @@ import { AuthGuard } from '@guards/auth.guard';
 import { OwnerGuard } from '@guards/Owner.guard';
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, ApiTags, ApiBody} from '@nestjs/swagger';
 
-@ApiTags('Users')        // Nome do grupo no Swagger
-// @ApiBearerAuth()         // Indica que precisa de token
-// @UseGuards(AuthGuard, RolesGuard)
-@UseGuards( RolesGuard)
+@ApiTags('Users')
+@ApiBearerAuth()        
+@UseGuards(AuthGuard, RolesGuard)
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
@@ -29,7 +28,7 @@ export class UserController {
   @ApiResponse({ status: 200, description: 'Return user.' })
   @ApiResponse({ status: 404, description: 'User not found.' })
   @Version('1')
-  @Get('email/:email') findUserByEmail(@Param('email') email: string) {
+  @Get('e/:email') findUserByEmail(@Param('email') email: string) {
     return this.userService.findByEmail(email);
   }
 
@@ -37,7 +36,7 @@ export class UserController {
   @ApiParam({ name: 'email', type: String, description: 'User email' })
   @ApiResponse({ status: 200, description: 'Return user.' })
   @ApiResponse({ status: 404, description: 'User not found.' })
-  @Version('1')
+  @Version('1') 
   @Get(':id') findUserById(@Param('id') id: string) {
     return this.userService.findUserById(id);
   }
@@ -58,7 +57,7 @@ export class UserController {
   @ApiResponse({ status: 200, description: 'User updated successfully.' })
   @ApiResponse({ status: 404, description: 'User not found.' })
   @Version('1')
-  @UseGuards(AuthGuard, OwnerGuard)
+  @UseGuards(OwnerGuard)
   @Patch(':id') updateUser(@Param('id') id: string, @Body() userDto: Partial<UserDto>) {
     return this.userService.updateUser(id, userDto);
   }
@@ -73,10 +72,21 @@ export class UserController {
     return this.userService.deleteUser(id);
   }
 
+  @ApiOperation({ summary: 'Delete a user by email' })
+  @ApiParam({ name: 'email', type: String })
+  @ApiResponse({ status: 200, description: 'User deleted successfully.' })
+  @ApiResponse({ status: 404, description: 'User not found.' })
+  @Version('1')
+  @Role(Roles.ADMIN)
+  @Delete('e/:email') deleteUserByEmail(@Param('email') email: string) {
+    return this.userService.deleteUserByEmail(email);
+  }
+
+
   @ApiOperation({ summary: 'Get all available roles' })
   @ApiResponse({ status: 200, description: 'Return list of roles.' })
   @Version('1')
-  @Get('roles/list') getRoles() {
+  @Get('roles') getRoles() {
     return this.userService.getUsersRoles();
   }
 }

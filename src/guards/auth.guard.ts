@@ -9,7 +9,6 @@ export class AuthGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<Request>();
 
-    // Primeiro tenta pegar do header Authorization
     let token: string | undefined;
     const authorizationHeader = request.headers.authorization;
 
@@ -20,7 +19,6 @@ export class AuthGuard implements CanActivate {
       }
     }
 
-    // Se não achou no header, tenta no cookie "access_token"
     if (!token && request.cookies?.access_token) {
       token = request.cookies.access_token;
     }
@@ -31,7 +29,7 @@ export class AuthGuard implements CanActivate {
 
     try {
       const payload = await this.jwtService.verifyAsync(token);
-      (request as any).user = payload; // ✅ adiciona o user decodificado na request
+      (request as any).user = payload; 
       return true;
     } catch (error) {
       throw new UnauthorizedException('Token inválido ou expirado');

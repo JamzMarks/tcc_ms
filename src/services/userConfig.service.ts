@@ -71,6 +71,28 @@ export class UserConfigService {
     return newConfig;
   }
 
+  async updateUserConfigByUserId(
+    userConfigId: string,
+    data: Partial<UserConfigDto>,
+  ): Promise<UserConfigDto> {
+    const config = await this.prisma.userConfig.findUnique({
+      where: { userId: userConfigId },
+    });
+
+    if (!config) {
+      throw new NotFoundException('User config not found');
+    }
+
+    const { userId, id, ...newConfigs } = data;
+    
+    const newConfig = await this.prisma.userConfig.update({
+      data: newConfigs,
+      where: { userId: userConfigId },
+    });
+
+    return newConfig;
+  }
+
   async deleteUserConfig(userId: string): Promise<void> {
     try {
       await this.prisma.userConfig.delete({

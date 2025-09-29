@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Language, Theme } from 'generated/prisma';
-import { IsEnum, IsNotEmpty } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsUUID } from 'class-validator';
 
 export class UserConfigDto {
   @ApiProperty({ example: 'StrongPassword123!' })
@@ -8,6 +8,7 @@ export class UserConfigDto {
 
   @ApiProperty({ example: 'Doe' })
   @IsNotEmpty()
+  @IsUUID()
   userId?: string;
 
   @ApiProperty({ enum: Language, default: Language.EN })

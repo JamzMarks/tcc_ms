@@ -137,20 +137,28 @@ export class UserService implements OnModuleInit {
     });
   }
 
-  async UpdateUserPassword(id: string, newPassword: string): Promise<User> {
-    const user = await this.prisma.user.findUnique({ where: { id } });
-    if (!user) throw new NotFoundException('User not found');
-    const hashedPassword = await hashPassword(newPassword);
-    return this.prisma.user.update({
-      where: { id },
-      data: { password: hashedPassword },
-    });
-  }
+  
 
   async deleteUser(id: string): Promise<User> {
     try {
       return await this.prisma.user.delete({
         where: { id },
+      });
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2025'
+      ) {
+        throw new NotFoundException('User not found');
+      }
+      throw error;
+    }
+  }
+
+  async deleteUserByEmail(email: string): Promise<User> {
+    try {
+      return await this.prisma.user.delete({
+        where: { email },
       });
     } catch (error) {
       if (
