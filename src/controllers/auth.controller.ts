@@ -6,10 +6,17 @@ import {
   Param,
   Post,
   Res,
+  UnauthorizedException,
   UseGuards,
   Version,
 } from '@nestjs/common';
-import { ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { LoginDto } from 'src/dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
 import { Roles } from 'generated/prisma';
@@ -17,7 +24,7 @@ import { AuthGuard } from '@guards/auth.guard';
 import { OwnerGuard } from '@guards/Owner.guard';
 import { UpdatePasswordDto } from '@dtos/auth/update-password.dto';
 
-@ApiTags('Auth') 
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -29,14 +36,7 @@ export class AuthController {
   @Version('1')
   @ApiResponse({ status: 200, description: 'Success signin.' })
   async signIn(@Body() loginDto: LoginDto) {
-    const payload = await this.authService.signin(loginDto);
-
-    const access_token = await this.jwtService.signAsync(payload);
-
-    return {
-      user: payload,
-      access_token,
-    };
+    return await this.authService.signin(loginDto);
   }
 
   @Version('1')
@@ -74,5 +74,12 @@ export class AuthController {
       body.newPassword,
       body.confirmationPassword,
     );
+  }
+
+  @Post('refresh')
+  @Version('1')
+  @ApiResponse({ status: 200, description: 'Refresh access token.' })
+  async refresh(@Body('refresh_token') refresh_token: string) {
+    return this.authService.refreshAccessToken(refresh_token);
   }
 }
