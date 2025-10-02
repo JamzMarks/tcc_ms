@@ -9,6 +9,7 @@ import { compare } from 'bcrypt';
 import { hashPassword } from '@utils/HashPassword';
 import { JwtService } from '@nestjs/jwt';
 import { PayloadDto } from '@dtos/auth/payload.dto';
+import { Response } from 'express';
 
 @Injectable()
 export class AuthService {
@@ -17,7 +18,7 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async signin(dto: LoginDto) {
+  async signin(dto: LoginDto, res: Response): Promise<any> {
     const normalizedEmail = dto.email.trim().toLowerCase();
     const user = await this.prisma.user.findUnique({
       where: { email: normalizedEmail },
@@ -29,10 +30,25 @@ export class AuthService {
 
     const payload = this.buildTokenPayload(user);
     const { access_token, refresh_token } = await this.generateTokens(payload);
+
+    res.cookie('access_token', access_token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 15 * 60 * 1000,
+    });
+
+    res.cookie('refresh_token', refresh_token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+    
     return {
       user: payload,
-      access_token,
-      refresh_token,
+      // access_token,
+      // refresh_token,
     };
   }
 

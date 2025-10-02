@@ -15,6 +15,7 @@ import { CreateUserDto } from 'src/dto/create-user.dto';
 import { parseRole } from '@utils/parseRole';
 import { UserConfigService } from './userConfig.service';
 import { CreateUserConfigDto } from '@dtos/userConfig/create-user-config.dto';
+import { UsersFilters } from '@dtos/users-filters.dto';
 
 @Injectable()
 export class UserService implements OnModuleInit {
@@ -43,7 +44,21 @@ export class UserService implements OnModuleInit {
     }
   }
 
-  async findUsers(): Promise<UserResponseDto[]> {
+  async findUsers(filters: UsersFilters): Promise<UserResponseDto[]> {
+    const { query, isActive, role, page = 1, limit = 20 } = filters;
+    const skip = (page - 1) * limit;
+    const queryData: Prisma.UserWhereInput[] = [
+      query ? {
+        OR: [
+              { email: { contains: query, mode: "insensitive" } },
+              { firstName: { contains: query, mode: "insensitive" } },
+              { lastName: { contains: query, mode: "insensitive" } },
+            ],
+      } : {},
+      role ? { role } : {},
+      isActive !== undefined ? { isActive } : {},
+    ];
+
     return this.prisma.user.findMany({
       select: {
         id: true,
@@ -56,6 +71,11 @@ export class UserService implements OnModuleInit {
         role: true,
         avatar: true,
       },
+      where: {
+          AND: queryData,
+        },
+        skip,
+        take: limit,
     });
   }
 

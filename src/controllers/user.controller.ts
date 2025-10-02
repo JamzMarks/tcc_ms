@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards, Version } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards, Version } from '@nestjs/common';
 import { UserService } from '../services/user.service';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UserDto } from 'src/dto/user.dto';
@@ -8,6 +8,7 @@ import { Roles } from 'generated/prisma';
 import { AuthGuard } from '@guards/auth.guard';
 import { OwnerGuard } from '@guards/Owner.guard';
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, ApiTags, ApiBody} from '@nestjs/swagger';
+import { UsersFilters } from '@dtos/users-filters.dto';
 
 @ApiTags('Users')
 @ApiBearerAuth()        
@@ -19,9 +20,18 @@ export class UserController {
   @ApiOperation({ summary: 'List all users' })
   @ApiResponse({ status: 200, description: 'Return a list of users.' })
   @Version('1')
-  @Get() async findUsers() {
-    return this.userService.findUsers();
+  @Get() async findUsers(@Query() filters: UsersFilters) {
+    return this.userService.findUsers(filters);
   }
+
+  // @ApiOperation({ summary: 'Get authenticated user' })
+  // @ApiParam({ name: 'id', type: String, description: 'User ID' })
+  // @ApiResponse({ status: 200, description: 'Return user.' })
+  // @ApiResponse({ status: 404, description: 'User not found.' })
+  // @Version('1')
+  // @Get('e/:email') findMe(@Param('email') email: string) {
+  //   return this.userService.findByEmail(email);
+  // }
 
   @ApiOperation({ summary: 'Get user by ID' })
   @ApiParam({ name: 'id', type: String, description: 'User ID' })
