@@ -79,6 +79,10 @@ export class AuthService {
   }
 
   async refreshAccessToken(refresh_token: string): Promise<string> {
+    console.log(refresh_token);
+    if (!refresh_token) {
+      throw new UnauthorizedException('No refresh token provided');
+    }
     const isValid = await this.validateRefreshToken(refresh_token);
     if (!isValid) {
       throw new UnauthorizedException('Invalid refresh token');

@@ -69,11 +69,11 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
     @Req() req: Request,
   ) {
+    console.log('Refreshing token...');
     const refreshToken = req.cookies['refresh_token'];
     if (!refreshToken) throw new UnauthorizedException('No refresh token');
 
-    const access_token =
-      await this.authService.refreshAccessToken(refreshToken);
+    const access_token = await this.authService.refreshAccessToken(refreshToken);
     res.cookie('access_token', access_token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',

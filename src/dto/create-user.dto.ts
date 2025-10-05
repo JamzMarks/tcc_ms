@@ -1,7 +1,7 @@
 // create-user.dto.ts
 import { ApiProperty } from '@nestjs/swagger';
 import { Roles } from 'generated/prisma';
-import { IsEmail, IsNotEmpty, MinLength } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsOptional, MinLength } from 'class-validator';
 import { Transform } from 'class-transformer';
 
 export class CreateUserDto {
@@ -22,6 +22,7 @@ export class CreateUserDto {
   @MinLength(8)
   password: string;
 
+  @IsOptional()
   @ApiProperty({ enum: Roles, default: Roles.USER })
   role?: Roles;
 }
